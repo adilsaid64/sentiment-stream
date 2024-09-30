@@ -4,7 +4,7 @@ class DataFetcher(ABC):
     """An interface for fetching data"""
 
     @abstractmethod
-    def fetch_data(self, limit = 5):
+    def fetch_data(self):
         """Fetch data from a data source"""
         pass
 

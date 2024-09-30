@@ -1,13 +1,17 @@
 version: '3'
 
-# Common configuration for Spark Workers using YAML anchor & alias
 x-spark-common: &spark-common
   image: bitnami/spark:latest
   volumes:
     - ./jobs:/opt/bitnami/spark/jobs
   command: bin/spark-class org.apache.spark.deploy.worker.Worker ${SPARK_MASTER_URL}
   depends_on:
-    - spark-master  # Ensure that the Spark master starts before the workers
+    - spark-master
+  environment:
+    SPARK_MODE: ${SPARK_MODE}
+    SPARK_WORKER_CORES: ${SPARK_WORKER_CORES}
+    SPARK_WORKER_MEMORY: ${SPARK_WORKER_MEMORY}
+    SPARK_MASTER_URL: ${SPARK_MASTER_URL}
   networks:
     - app-network
 
@@ -18,31 +22,48 @@ services:
     container_name: zookeeper
     ports:
       - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT}
+      ZOOKEEPER_TICK_TIME: ${ZOOKEEPER_TICK_TIME}
     healthcheck:
-      test: ['CMD', 'bash', '-c', "echo 'ruok' | nc localhost 2181"]  # Health check to ensure Zookeeper is responsive
+      test: ['CMD', 'bash', '-c', "echo 'ruok' | nc localhost ${ZOOKEEPER_CLIENT_PORT}"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
       - app-network
-  
+
   broker:
     image: confluentinc/cp-server:7.4.0
     hostname: broker
     container_name: broker
     depends_on:
       zookeeper:
-        condition: service_healthy  # Start Kafka only when Zookeeper is healthy
+        condition: service_healthy
     ports:
       - "9092:9092"
       - "9101:9101"
     environment:
-      # Kafka connection details
       KAFKA_BROKER_ID: ${KAFKA_BROKER_ID}
       KAFKA_ZOOKEEPER_CONNECT: ${KAFKA_ZOOKEEPER_CONNECT}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: ${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}
       KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
+      KAFKA_METRIC_REPORTERS: ${KAFKA_METRIC_REPORTERS}
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR}
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: ${KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS}
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: ${KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR}
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: ${KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR}
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: ${KAFKA_TRANSACTION_STATE_LOG_MIN_ISR}
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: ${KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR}
+      KAFKA_JMX_PORT: ${KAFKA_JMX_PORT}
+      KAFKA_JMX_HOSTNAME: ${KAFKA_JMX_HOSTNAME}
+      KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: ${KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL}
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: ${CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS}
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: ${CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS}
+      CONFLUENT_METRICS_ENABLE: ${CONFLUENT_METRICS_ENABLE}
+      CONFLUENT_SUPPORT_CUSTOMER_ID: ${CONFLUENT_SUPPORT_CUSTOMER_ID}
     healthcheck:
-      test: [ 'CMD', 'bash', '-c', "nc -z localhost 9092" ]  # Health check for Kafka broker
+      test: [ 'CMD', 'bash', '-c', "nc -z localhost 9092" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -53,16 +74,15 @@ services:
     image: bitnami/spark:latest
     volumes:
       - ./jobs:/opt/bitnami/spark/jobs
-    command: bin/spark-class org.apache.spark.deploy.master.Master  # Run Spark master
+    command: bin/spark-class org.apache.spark.deploy.master.Master
     ports:
-      - "9090:8080"  # Spark master web UI
-      - "7077:7077"  # Spark master communication port
+      - "9090:8080"
+      - "7077:7077"
     networks:
       - app-network
 
-  # Two Spark worker services using the common configuration
   spark-worker-1:
-    <<: *spark-common  # Use shared configuration for Spark workers
+    <<: *spark-common
 
   spark-worker-2:
     <<: *spark-common

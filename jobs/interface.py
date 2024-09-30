@@ -10,6 +10,8 @@ class DataFetcher(ABC):
 
 class MessageProducer(ABC):
     """Interface for sending messages to a message broker"""
+   
+    @abstractmethod
     def send_message(self, message):
         """Send message to message broker"""
         pass

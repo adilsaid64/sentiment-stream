@@ -1,0 +1,71 @@
+version: '3'
+
+# Common configuration for Spark Workers using YAML anchor & alias
+x-spark-common: &spark-common
+  image: bitnami/spark:latest
+  volumes:
+    - ./jobs:/opt/bitnami/spark/jobs
+  command: bin/spark-class org.apache.spark.deploy.worker.Worker ${SPARK_MASTER_URL}
+  depends_on:
+    - spark-master  # Ensure that the Spark master starts before the workers
+  networks:
+    - app-network
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    healthcheck:
+      test: ['CMD', 'bash', '-c', "echo 'ruok' | nc localhost 2181"]  # Health check to ensure Zookeeper is responsive
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+  
+  broker:
+    image: confluentinc/cp-server:7.4.0
+    hostname: broker
+    container_name: broker
+    depends_on:
+      zookeeper:
+        condition: service_healthy  # Start Kafka only when Zookeeper is healthy
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      # Kafka connection details
+      KAFKA_BROKER_ID: ${KAFKA_BROKER_ID}
+      KAFKA_ZOOKEEPER_CONNECT: ${KAFKA_ZOOKEEPER_CONNECT}
+      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
+    healthcheck:
+      test: [ 'CMD', 'bash', '-c', "nc -z localhost 9092" ]  # Health check for Kafka broker
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  spark-master:
+    image: bitnami/spark:latest
+    volumes:
+      - ./jobs:/opt/bitnami/spark/jobs
+    command: bin/spark-class org.apache.spark.deploy.master.Master  # Run Spark master
+    ports:
+      - "9090:8080"  # Spark master web UI
+      - "7077:7077"  # Spark master communication port
+    networks:
+      - app-network
+
+  # Two Spark worker services using the common configuration
+  spark-worker-1:
+    <<: *spark-common  # Use shared configuration for Spark workers
+
+  spark-worker-2:
+    <<: *spark-common
+
+networks:
+  app-network:

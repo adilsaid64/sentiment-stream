@@ -1,2 +1,4 @@
 env
+venv
 .env
+jobs/__pycache__

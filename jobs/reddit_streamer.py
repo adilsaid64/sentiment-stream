@@ -29,6 +29,9 @@ class RedditFetcher(DataFetcher):
             }
 
 
+
+
+
 def test_fetch_data(reddit_fetcher):
     try:
         for submission in reddit_fetcher.fetch_data():

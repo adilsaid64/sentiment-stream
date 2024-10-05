@@ -29,24 +29,21 @@ class RedditFetcher(DataFetcher):
             }
 
 
+# def test_fetch_data(reddit_fetcher):
+#     try:
+#         for submission in reddit_fetcher.fetch_data():
+#             print(json.dumps(submission, indent=2))
+#     except Exception as e:
+#         print(f"An error occurred: {e}")
 
+# if __name__ == "__main__":
 
+#     load_dotenv()
+#     reddit_client_id = os.getenv('REDDIT_CLIENT_ID')
+#     reddit_client_secret = os.getenv('REDDIT_CLIENT_SECRET')
+#     reddit_user_agent = os.getenv('REDDIT_USER_AGENT')
 
-def test_fetch_data(reddit_fetcher):
-    try:
-        for submission in reddit_fetcher.fetch_data():
-            print(json.dumps(submission, indent=2))
-    except Exception as e:
-        print(f"An error occurred: {e}")
+#     subreddit = "all"
 
-if __name__ == "__main__":
-
-    load_dotenv()
-    reddit_client_id = os.getenv('REDDIT_CLIENT_ID')
-    reddit_client_secret = os.getenv('REDDIT_CLIENT_SECRET')
-    reddit_user_agent = os.getenv('REDDIT_USER_AGENT')
-
-    subreddit = "all"
-
-    reddit_fetcher = RedditFetcher(reddit_client_id, reddit_client_secret, reddit_user_agent, subreddit)
-    test_fetch_data(reddit_fetcher)
+#     reddit_fetcher = RedditFetcher(reddit_client_id, reddit_client_secret, reddit_user_agent, subreddit)
+#     test_fetch_data(reddit_fetcher)

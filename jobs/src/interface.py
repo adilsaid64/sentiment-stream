@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class DataFetcher(ABC):
+class FetchStrategy(ABC):
     """An interface for fetching data"""
 
     @abstractmethod
@@ -8,7 +8,7 @@ class DataFetcher(ABC):
         """Fetch data from a data source"""
         pass
 
-class MessageProducer(ABC):
+class MessageProducerStrategy(ABC):
     """Interface for sending messages to a message broker"""
    
     @abstractmethod

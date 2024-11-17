@@ -46,6 +46,6 @@ def list_kafka_topics(kafka_servers):
         print(f" - {topic}")
 
 kafka_servers = 'localhost:9092'
-create_kafka_topic("reddit", kafka_servers)
+create_kafka_topic("twitter", kafka_servers)
 list_kafka_topics(kafka_servers)
 # delete_kafka_topic("reddit", kafka_servers)

@@ -26,13 +26,14 @@ if __name__ == "__main__":
     #                                            reddit_client_secret, 
     #                                            reddit_user_agent, 
     #                                            subreddit))
+    reddit_topic = 'reddit'
     
     twitter_fetcher = DataFetcher(TwitterFetcher(df = pd.read_csv('../data/twitter_dataset.csv')))
+    twitter_topic = 'twitter'
 
     kafka_servers = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9092')
-    kafka_topic = os.getenv('KAFKA_TOPIC', 'reddit')
     
-    kafka_producer = MessageProducer(KafkaProducer(kafka_server=kafka_servers, topic = 'twitter'))
+    kafka_producer = MessageProducer(KafkaProducer(kafka_server=kafka_servers, topic = twitter_topic))
 
     stream_data(data_fetcher=twitter_fetcher, 
                     message_producer=kafka_producer)

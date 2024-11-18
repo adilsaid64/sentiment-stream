@@ -19,4 +19,3 @@ class TwitterFetcher(FetchStrategy):
                     'comment' : row['Text'],
                     'time' : datetime.datetime.now().timestamp()
                 }
-            logger.info("RESTARTING!")

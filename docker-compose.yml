@@ -98,7 +98,10 @@ services:
 
   twitter-streamer-1:
     <<: *python-streamer-common
-    command: /bin/sh -c "pwd && python -m venv venv && venv/bin/pip install -r requirements.txt && venv/bin/python jobs/main.py"
+    command: /bin/sh -c "pwd && python -m venv venv && venv/bin/pip install -r requirements.txt && venv/bin/python jobs/stream_twitter.py"
+  reddit-streamer-1:
+    <<: *python-streamer-common
+    command: /bin/sh -c "pwd && python -m venv venv && venv/bin/pip install -r requirements.txt && venv/bin/python jobs/stream_reddit.py"
 
   spark-worker-1:
     <<: *spark-common

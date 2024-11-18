@@ -15,6 +15,20 @@ x-spark-common: &spark-common
   networks:
     - app-network
 
+x-python-streamer: &python-streamer-common
+  image: python:3.10-slim
+  volumes:
+    - ./jobs:/app/jobs
+    - ./data:/app/data
+    - ./requirements.txt:/app/requirements.txt
+  working_dir: /app
+  env_file:
+    - .env
+  networks:
+    - app-network
+  depends_on:
+    - broker
+
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
@@ -26,7 +40,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT}
       ZOOKEEPER_TICK_TIME: ${ZOOKEEPER_TICK_TIME}
     healthcheck:
-      test: ['CMD', 'bash', '-c', "echo 'ruok' | nc localhost ${ZOOKEEPER_CLIENT_PORT}"]
+      test: [ 'CMD', 'bash', '-c', "echo 'ruok' | nc localhost ${ZOOKEEPER_CLIENT_PORT}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -69,6 +83,7 @@ services:
       retries: 5
     networks:
       - app-network
+    restart: on-failure
 
   spark-master:
     image: bitnami/spark:latest
@@ -80,6 +95,10 @@ services:
       - "7077:7077"
     networks:
       - app-network
+
+  twitter-streamer-1:
+    <<: *python-streamer-common
+    command: /bin/sh -c "pwd && python -m venv venv && venv/bin/pip install -r requirements.txt && venv/bin/python jobs/main.py"
 
   spark-worker-1:
     <<: *spark-common

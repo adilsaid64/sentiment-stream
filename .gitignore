@@ -2,3 +2,5 @@ env
 venv
 .env
 __pycache__**
+.backup.env
+command.txt

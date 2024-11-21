@@ -14,7 +14,7 @@ def main() -> None:
     spark: SparkSession = create_spark_session("SparkTwitter")
 
     twitter_schema: StructType = get_twitter_schema()
-    kafka_stream: DataFrame = read_kafka_stream(spark, "twitter", reddit_schema)
+    kafka_stream: DataFrame = read_kafka_stream(spark, "twitter", twitter_schema)
 
     logger.info("Starting stream processing...")
     query = kafka_stream.writeStream.foreachBatch(process_batch).start()

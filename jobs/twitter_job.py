@@ -2,7 +2,7 @@
 docker exec sentiment-stream-spark-master-1 spark-submit --master spark://spark-master:7077 --deploy-mode client --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.0 /opt/bitnami/spark/jobs/twitter_job.py
 """
 
-from spark_utils import logger, create_spark_session, get_twitter_schema, read_kafka_stream, process_batch
+from jobs.src.spark_utils import logger, create_spark_session, get_twitter_schema, read_kafka_stream, process_batch
 from pyspark.sql.types import StructType
 from pyspark.sql import SparkSession, DataFrame
 

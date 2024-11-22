@@ -1,4 +1,4 @@
-from spark_utils import logger, create_spark_session, get_reddit_schema, read_kafka_stream, process_batch
+from jobs.src.spark_utils import logger, create_spark_session, get_reddit_schema, read_kafka_stream, process_batch
 from pyspark.sql.types import StructType
 from pyspark.sql import SparkSession, DataFrame
 

@@ -1,11 +1,9 @@
 from src.reddit_fetcher import RedditFetcher
-from src.twitter_fetcher import TwitterFetcher
 from src.kafka_producer import KafkaProducer
 from src.utils import stream_data
 from src.context import  DataFetcher, MessageProducer
 from dotenv import load_dotenv
 import os
-import json
 import pandas as pd
 
 

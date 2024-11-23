@@ -4,3 +4,4 @@ venv
 __pycache__**
 .backup.env
 command.txt
+minio

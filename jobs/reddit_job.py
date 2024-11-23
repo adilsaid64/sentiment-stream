@@ -1,4 +1,4 @@
-from jobs.src.spark_utils import logger, create_spark_session, get_reddit_schema, read_kafka_stream, process_batch
+from jobs.src.spark_utils import logger, create_spark_session, get_reddit_schema, read_kafka_stream, process_reddit_batch
 from pyspark.sql.types import StructType
 from pyspark.sql import SparkSession, DataFrame
 
@@ -13,7 +13,7 @@ def main() -> None:
     kafka_stream: DataFrame = read_kafka_stream(spark, "reddit", reddit_schema)
 
     logger.info("Starting stream processing...")
-    query = kafka_stream.writeStream.foreachBatch(process_batch).start()
+    query = kafka_stream.writeStream.foreachBatch(process_reddit_batch).start()
 
     try:
         query.awaitTermination()

@@ -110,6 +110,17 @@ services:
   spark-worker-2:
     <<: *spark-common
 
+  flask-backend:
+    image: python:3.10-slim
+    container_name: flask-backend
+    volumes:
+      - ./flask-dashboard:/app/flask-dashboard
+    command: /bin/sh -c "pip install flask && ls && python app/flask-dashboard/app.py"
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+
   minio:
     image: minio/minio:latest
     container_name: minio

@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.functions import from_json, col, udf
+from pyspark.sql.functions import from_json, col, udf, rand
 from pyspark.sql.types import StructType, StructField, StringType, LongType, FloatType
 # from textblob import TextBlob
 
@@ -82,9 +82,7 @@ def process_twitter_batch(batch_df: DataFrame, batch_id: int) -> None:
     logger.info(f"Processing Batch ID: {batch_id} with {batch_df.count()} records")
     batch_df.printSchema()
 
-    # with_sentiment = batch_df.withColumn(
-    #     'sentiment_score', sentiment_udf(col('comment'))
-    # )
+    batch_df = batch_df.withColumn('sentiment', rand(seed=23)*100)
 
     batch_df.show(truncate=False)
     bucket_name = "twitter-data"
@@ -97,9 +95,7 @@ def process_reddit_batch(batch_df: DataFrame, batch_id: int) -> None:
     logger.info(f"Processing Batch ID: {batch_id} with {batch_df.count()} records")
     batch_df.printSchema()
 
-    # with_sentiment = batch_df.withColumn(
-    #     'sentiment_score', sentiment_udf(col('comment'))
-    # )
+    batch_df = batch_df.withColumn('sentiment', rand(seed=23)*100)
 
     batch_df.show(truncate=False)
     bucket_name = "reddit-data"

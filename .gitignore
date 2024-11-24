@@ -5,3 +5,4 @@ __pycache__**
 .backup.env
 command.txt
 minio
+redis

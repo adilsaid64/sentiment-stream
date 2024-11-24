@@ -141,5 +141,14 @@ services:
       timeout: 10s
       retries: 3
 
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis:/data
+    command: [ "redis-server", "--appendonly", "yes" ]
+    restart: always
+
 networks:
   app-network:

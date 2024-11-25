@@ -11,14 +11,17 @@ def create_spark_session(app_name: str) -> SparkSession:
     """
     Create and configure a Spark session.
     """
+
     return (
         SparkSession.builder.appName(app_name)
-        .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1")
+        .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.4,com.redislabs:spark-redis_2.12:3.1.0") 
         .config("spark.hadoop.fs.s3a.endpoint", "http://minio:9000") \
         .config("spark.hadoop.fs.s3a.access.key", "vdLPy1Qo36MrfwPumKAt") \
         .config("spark.hadoop.fs.s3a.secret.key", "W0yOZ1T6yEIMgcVLwGANEwbVs4WEqiTzfXVM3XM5") \
         .config("spark.hadoop.fs.s3a.path.style.access", "true") \
         .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
+        .config("spark.redis.host", "redis") \
+        .config("spark.redis.port", "6379") \
         .getOrCreate()
     )
 
@@ -83,10 +86,14 @@ def process_twitter_batch(batch_df: DataFrame, batch_id: int) -> None:
     batch_df.printSchema()
 
     batch_df = batch_df.withColumn('sentiment', rand(seed=23)*100)
-
     batch_df.show(truncate=False)
+
     bucket_name = "twitter-data"
     write_to_bucket(batch_df=batch_df, bucket_name=bucket_name)
+    logger.info(f'Wrote {batch_id} to S3')
+
+    write_to_redis(batch_df=batch_df, table_name= 'twitter', id_column='id')
+    logger.info(f'Wrote {batch_id} to Redis')
 
     logger.info(f"Batch {batch_id} Processsed")
 
@@ -96,10 +103,14 @@ def process_reddit_batch(batch_df: DataFrame, batch_id: int) -> None:
     batch_df.printSchema()
 
     batch_df = batch_df.withColumn('sentiment', rand(seed=23)*100)
-
     batch_df.show(truncate=False)
+
     bucket_name = "reddit-data"
     write_to_bucket(batch_df=batch_df, bucket_name=bucket_name)
+
+    write_to_redis(batch_df=batch_df, table_name= 'reddit', id_column='id')
+    logger.info(f'Wrote {batch_id} to Redis')
+    
     logger.info(f"Batch {batch_id} Processsed")
 
 
@@ -110,3 +121,12 @@ def write_to_bucket(batch_df:DataFrame, bucket_name:str)->None:
     batch_df.write.json(output_path)
     logger.info(f"Written to Bucket: {bucket_name} - Key: {output_path}")
 
+
+def write_to_redis(batch_df : DataFrame, table_name:str, id_column:str)->None:
+    (batch_df.
+    write.
+    format("org.apache.spark.sql.redis").
+    option("table", table_name).
+    option("key.column", id_column).
+    save(mode = 'append')
+    )

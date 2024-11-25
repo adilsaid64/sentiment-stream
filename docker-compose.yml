@@ -1,7 +1,7 @@
 version: '3'
 
 x-spark-common: &spark-common
-  image: bitnami/spark:latest
+  image: bitnami/spark:3.2.4
   volumes:
     - ./jobs:/opt/bitnami/spark/jobs
   command: bin/spark-class org.apache.spark.deploy.worker.Worker ${SPARK_MASTER_URL}
@@ -86,7 +86,7 @@ services:
     restart: on-failure
 
   spark-master:
-    image: bitnami/spark:latest
+    image: bitnami/spark:3.2.4
     volumes:
       - ./jobs:/opt/bitnami/spark/jobs
     command: bin/spark-class org.apache.spark.deploy.master.Master
@@ -149,6 +149,8 @@ services:
       - ./redis:/data
     command: [ "redis-server", "--appendonly", "yes" ]
     restart: always
+    networks:
+      - app-network
 
 networks:
   app-network:

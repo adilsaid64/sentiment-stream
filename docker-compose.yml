@@ -115,7 +115,7 @@ services:
     container_name: flask-backend
     volumes:
       - ./flask-dashboard:/app/flask-dashboard
-    command: /bin/sh -c "pip install flask && ls && python app/flask-dashboard/app.py"
+    command: /bin/sh -c "pip install flask && pip install redis && pip install Flask-Cors && ls && python app/flask-dashboard/app.py"
     ports:
       - "5000:5000"
     networks:

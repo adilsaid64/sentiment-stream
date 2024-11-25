@@ -59,8 +59,17 @@ function stopStream() {
     clearInterval(streamInterval);
 }
 
+function test() {
+    fetch("http://127.0.0.1:5000/redis?prefix=reddit")
+        .then((response) => response.json())
+        .then((json) => {
+            console.log(json)
+        }
+        ).catch((error) => console.error("Error fetching data:", error));
+}
+
 function getData() {
-    fetch("http://127.0.0.1:5000/api/data")
+    fetch("http://127.0.0.1:5000/api/randomdata")
         .then((response) => response.json())
         .then((json) => {
             storeData(json, dataQueue1);
@@ -71,7 +80,7 @@ function getData() {
         .catch((error) => console.error("Error fetching data:", error));
 
 
-    fetch("http://127.0.0.1:5000/api/data")
+    fetch("http://127.0.0.1:5000/api/randomdata")
         .then((response) => response.json())
         .then((json) => {
             storeData(json, dataQueue2);

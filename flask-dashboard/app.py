@@ -23,21 +23,68 @@ def get_data():
         "time": datetime.datetime.now(),
         "value": random.randint(1, 100),
     }
+    
     return jsonify(data)
 
-@app.route('/api/data', methods=['GET'])
-def fetch_data():
+SEEN_SET_NAME = "seen_keys"
+
+@app.route('/api/historical', methods=['GET'])
+def fetch_historical():
+    """
+    Fetch all historical data on page refresh without filtering for 'seen' state.
+    """
     prefix = request.args.get('prefix')
 
     matching_keys = redis_client.keys(f"{prefix}*")
-    data = []
+    twitter_data = []
+    reddit_data = []
 
     for key in matching_keys:
         key_type = redis_client.type(key)
         if key_type == 'hash':
-            data.append(redis_client.hgetall(key))
+            d = redis_client.hgetall(key)
+            if 'key' in d:
+                if d['key'] == 'reddit_mean':
+                    reddit_data.append(d)
+                elif d['key'] == 'twitter_mean':
+                    twitter_data.append(d)
 
-    return jsonify({"prefix": prefix, "results": data})
+    # Sort by timestamp
+    reddit_data = sorted(reddit_data, key=lambda i: i['timestamp'])
+    twitter_data = sorted(twitter_data, key=lambda i: i['timestamp'])
 
+    return jsonify({"prefix": prefix, "reddit_mean": reddit_data, 'twitter_data': twitter_data})
+
+
+@app.route('/api/latest', methods=['GET'])
+def fetch_latest():
+    """
+    Fetch only the latest unseen data every 3 seconds.
+    """
+    prefix = request.args.get('prefix')
+
+    matching_keys = redis_client.keys(f"{prefix}*")
+
+    matching_keys = sorted(matching_keys, key=lambda i: i.split(':')[1].split('::')[0], reverse=True)
+
+    twitter_data = []
+    reddit_data = []
+
+    unseen_keys = [key for key in matching_keys if not redis_client.sismember(SEEN_SET_NAME, key)]
+
+    for key in unseen_keys:
+        key_type = redis_client.type(key)
+        if key_type == 'hash':
+            d = redis_client.hgetall(key)
+            if 'key' in d:
+                if d['key'] == 'reddit_mean':
+                    reddit_data.append(d)
+                elif d['key'] == 'twitter_mean':
+                    twitter_data.append(d)
+
+    for key in unseen_keys:
+        redis_client.sadd(SEEN_SET_NAME, key)
+
+    return jsonify({"prefix": prefix, "reddit_mean": reddit_data, 'twitter_data': twitter_data})
 if __name__  == "__main__":
      app.run(host="0.0.0.0", port=5000, debug=True)

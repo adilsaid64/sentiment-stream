@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.functions import from_json, col, udf, rand
+from pyspark.sql.functions import from_json, col, udf, rand, current_timestamp
 from pyspark.sql.types import StructType, StructField, StringType, LongType, FloatType
+import pyspark.sql.functions as f
 # from textblob import TextBlob
 
 import datetime
@@ -95,6 +96,9 @@ def process_twitter_batch(batch_df: DataFrame, batch_id: int) -> None:
     write_to_redis(batch_df=batch_df, table_name= 'twitter', id_column='id')
     logger.info(f'Wrote {batch_id} to Redis')
 
+
+    write_to_redis_with_timestamp(batch_df=batch_df, table_name='twitter_mean', sentiment_column = 'sentiment')
+
     logger.info(f"Batch {batch_id} Processsed")
 
 
@@ -110,6 +114,9 @@ def process_reddit_batch(batch_df: DataFrame, batch_id: int) -> None:
 
     write_to_redis(batch_df=batch_df, table_name= 'reddit', id_column='id')
     logger.info(f'Wrote {batch_id} to Redis')
+
+    write_to_redis_with_timestamp(batch_df=batch_df, table_name='reddit_mean', sentiment_column = 'sentiment')
+
     
     logger.info(f"Batch {batch_id} Processsed")
 
@@ -121,7 +128,6 @@ def write_to_bucket(batch_df:DataFrame, bucket_name:str)->None:
     batch_df.write.json(output_path)
     logger.info(f"Written to Bucket: {bucket_name} - Key: {output_path}")
 
-
 def write_to_redis(batch_df : DataFrame, table_name:str, id_column:str)->None:
     (batch_df.
     write.
@@ -129,4 +135,24 @@ def write_to_redis(batch_df : DataFrame, table_name:str, id_column:str)->None:
     option("table", table_name).
     option("key.column", id_column).
     save(mode = 'append')
+    )
+
+
+
+
+
+def write_to_redis_with_timestamp(batch_df: DataFrame, table_name: str, sentiment_column: str) -> None:
+    sentiment_mean = batch_df.agg({sentiment_column: "mean"}).collect()[0][0]
+    
+    mean_df = batch_df.sql_ctx.sparkSession.createDataFrame(
+        [(table_name, sentiment_mean)], ["key", "value"]
+    ).withColumn("timestamp", current_timestamp())
+    mean_df = mean_df.withColumn("uuid", f.expr("uuid()"))
+    
+    (mean_df
+     .write
+     .format("org.apache.spark.sql.redis")
+     .option("table", "mean_store")
+     .option("key.column", "uuid")
+     .save(mode="append")
     )

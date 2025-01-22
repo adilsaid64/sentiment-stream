@@ -24,4 +24,5 @@ if __name__ == "__main__":
     kafka_producer = MessageProducer(KafkaProducer(kafka_server=kafka_servers, topic = reddit_topic))
 
     stream_data(data_fetcher=reddit_fetcher, 
-                    message_producer=kafka_producer)
+                    message_producer=kafka_producer,
+                    sleep_time_s=1)

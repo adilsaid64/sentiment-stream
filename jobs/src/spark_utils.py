@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.functions import from_json, col, udf, rand, current_timestamp, concat_ws
+from pyspark.sql.functions import from_json, col, udf, rand, current_timestamp, concat_ws, randn
 from pyspark.sql.types import StructType, StructField, StringType, LongType, FloatType
 import pyspark.sql.functions as f
 # from textblob import TextBlob
@@ -74,19 +74,22 @@ def read_kafka_stream(spark: SparkSession, topic: str, schema: StructType) -> Da
     )
 
 
-def analyze_sentiment(text: str) -> float:
-    if text:
-        # return TextBlob(text).sentiment.polarity
-        0.2
-    return 0.0
+# def analyze_sentiment(text: str) -> float:
+#     if text:
+#         analysis = TextBlob(text)
+#         return float(analysis.sentiment.polarity)
+#     return 0.0
 
-sentiment_udf = udf(analyze_sentiment, FloatType())
+# sentiment_udf = udf(analyze_sentiment, FloatType())
 
 def process_twitter_batch(batch_df: DataFrame, batch_id: int) -> None:
     logger.info(f"Processing Batch ID: {batch_id} with {batch_df.count()} records")
     batch_df.printSchema()
 
-    batch_df = batch_df.withColumn('sentiment', rand(seed=23)*100)
+    batch_df = batch_df.withColumn('sentiment', (rand() * 2) - 1)
+
+    # batch_df = batch_df.withColumn('sentiment', sentiment_udf(col('comment')))
+
     batch_df.show(truncate=False)
 
     bucket_name = "twitter-data"
@@ -106,7 +109,9 @@ def process_reddit_batch(batch_df: DataFrame, batch_id: int) -> None:
     logger.info(f"Processing Batch ID: {batch_id} with {batch_df.count()} records")
     batch_df.printSchema()
 
-    batch_df = batch_df.withColumn('sentiment', rand(seed=23)*100)
+    batch_df = batch_df.withColumn('sentiment', (rand() * 2) - 1)
+    # batch_df = batch_df.withColumn('sentiment', sentiment_udf(col('title')))
+
     batch_df.show(truncate=False)
 
     bucket_name = "reddit-data"

@@ -15,20 +15,6 @@ x-spark-common: &spark-common
   networks:
     - app-network
 
-x-python-streamer: &python-streamer-common
-  image: python:3.10-slim
-  volumes:
-    - ./jobs:/app/jobs
-    - ./data:/app/data
-    - ./requirements.txt:/app/requirements.txt
-  working_dir: /app
-  env_file:
-    - .env
-  networks:
-    - app-network
-  depends_on:
-    - broker
-
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
@@ -97,12 +83,26 @@ services:
       - app-network
 
   twitter-streamer-1:
-    <<: *python-streamer-common
-    command: /bin/sh -c "pwd && python -m venv venv && cat requirements.txt && venv/bin/pip install -r requirements.txt && venv/bin/python jobs/stream_twitter.py"
+    build: ./twitter-streamer
+    volumes:
+      - ./jobs/src:/app/src
+    env_file:
+      - .env
+    networks:
+      - app-network
+    depends_on:
+      - broker
 
   reddit-streamer-1:
-    <<: *python-streamer-common
-    command: /bin/sh -c "pwd && python -m venv venv && venv/bin/pip install -r requirements.txt && venv/bin/python jobs/stream_reddit.py"
+    build: ./reddit-streamer
+    volumes:
+      - ./jobs/src:/app/src
+    env_file:
+      - .env
+    networks:
+      - app-network
+    depends_on:
+      - broker
 
   spark-worker-1:
     <<: *spark-common

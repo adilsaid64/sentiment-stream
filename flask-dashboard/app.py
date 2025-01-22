@@ -53,7 +53,7 @@ def fetch_historical():
     reddit_data = sorted(reddit_data, key=lambda i: i['timestamp'])
     twitter_data = sorted(twitter_data, key=lambda i: i['timestamp'])
 
-    return jsonify({"prefix": prefix, "reddit_mean": reddit_data, 'twitter_data': twitter_data})
+    return jsonify({"prefix": prefix, "reddit_mean": reddit_data, 'twitter_mean': twitter_data})
 
 
 @app.route('/api/latest', methods=['GET'])
@@ -72,19 +72,19 @@ def fetch_latest():
 
     unseen_keys = [key for key in matching_keys if not redis_client.sismember(SEEN_SET_NAME, key)]
 
-    for key in unseen_keys:
-        key_type = redis_client.type(key)
-        if key_type == 'hash':
-            d = redis_client.hgetall(key)
-            if 'key' in d:
-                if d['key'] == 'reddit_mean':
-                    reddit_data.append(d)
-                elif d['key'] == 'twitter_mean':
-                    twitter_data.append(d)
+    # for key in unseen_keys:
+    #     key_type = redis_client.type(key)
+    #     if key_type == 'hash':
+    #         d = redis_client.hgetall(key)
+    #         if 'key' in d:
+    #             if d['key'] == 'reddit_mean':
+    #                 reddit_data.append(d)
+    #             elif d['key'] == 'twitter_mean':
+    #                 twitter_data.append(d)
 
-    for key in unseen_keys:
-        redis_client.sadd(SEEN_SET_NAME, key)
+    # for key in unseen_keys:
+    #     redis_client.sadd(SEEN_SET_NAME, key)
 
-    return jsonify({"prefix": prefix, "reddit_mean": reddit_data, 'twitter_data': twitter_data})
+    return jsonify({"prefix": prefix, "reddit_mean": reddit_data, 'twitter_mean': twitter_data})
 if __name__  == "__main__":
      app.run(host="0.0.0.0", port=5000, debug=True)

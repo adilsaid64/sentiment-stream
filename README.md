@@ -1,9 +1,15 @@
 # sentiment-stream
 An end-to-end real-time data streaming pipeline that leverages Kafka and Spark Streaming to analyze social media sentiment trends. 
 
-Project still in progress...
+Currently  what it does (Without Nginx):
 
 ![alt text](images/architecture.png)
+
+
+What I am building:
+
+![alt text](images//social-media-sentiment.drawio.png)
+
 
 ## Architecture
 

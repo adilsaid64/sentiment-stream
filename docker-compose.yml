@@ -112,6 +112,14 @@ services:
     depends_on:
       - broker
 
+  fastapi-ml-endpoint:
+    build: ./fastapi-ml-endpoint
+    ports:
+      - "8000:8000"
+    restart: always
+    networks:
+      - app-network
+
   spark-worker-1:
     <<: *spark-common
 

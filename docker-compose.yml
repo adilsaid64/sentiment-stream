@@ -71,6 +71,14 @@ services:
       - app-network
     restart: on-failure
 
+  init-kafka:
+    build: ./init-kafka
+    networks:
+      - app-network
+    depends_on:
+      broker:
+        condition: service_healthy
+
   spark-master:
     image: bitnami/spark:3.2.4
     volumes:

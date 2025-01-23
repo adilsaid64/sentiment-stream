@@ -2,9 +2,10 @@ from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.functions import from_json, col, udf, rand, current_timestamp, concat_ws, randn
 from pyspark.sql.types import StructType, StructField, StringType, LongType, FloatType
 import pyspark.sql.functions as f
-# from textblob import TextBlob
 
 import datetime
+import urllib.request
+import json
 
 from src.proj_logger import logger
 
@@ -74,13 +75,19 @@ def read_kafka_stream(spark: SparkSession, topic: str, schema: StructType) -> Da
     )
 
 
-# def analyze_sentiment(text: str) -> float:
-#     if text:
-#         analysis = TextBlob(text)
-#         return float(analysis.sentiment.polarity)
-#     return 0.0
+def fetch_sentiment(text: str) -> float:
+    """Fetch sentiment from FastAPI endpoint using urllib."""
+    try:
+        url = f"http://fastapi-ml-endpoint:8000/sentiment?text={urllib.parse.quote(text)}"
+        with urllib.request.urlopen(url) as response:
+            data = json.loads(response.read().decode())
+            return float(data["sentiment"])
+    except Exception as e:
+        print(f"Error fetching sentiment: {e}")
+        return 0.0  # Default neutral sentiment
 
-# sentiment_udf = udf(analyze_sentiment, FloatType())
+sentiment_udf = udf(fetch_sentiment, FloatType())
+
 
 def process_twitter_batch(batch_df: DataFrame, batch_id: int) -> None:
     logger.info(f"Processing Batch ID: {batch_id} with {batch_df.count()} records")
@@ -109,9 +116,10 @@ def process_reddit_batch(batch_df: DataFrame, batch_id: int) -> None:
     logger.info(f"Processing Batch ID: {batch_id} with {batch_df.count()} records")
     batch_df.printSchema()
 
-    batch_df = batch_df.withColumn('sentiment', (rand() * 2) - 1)
+    # batch_df = batch_df.withColumn('sentiment', (rand() * 2) - 1)
     # batch_df = batch_df.withColumn('sentiment', sentiment_udf(col('title')))
-
+    # batch_df = batch_df.withColumn('sentiment', sentiment_udf(col('title')))
+    batch_df.withColumn('sentiment', sentiment_udf(batch_df.title))
     batch_df.show(truncate=False)
 
     bucket_name = "reddit-data"

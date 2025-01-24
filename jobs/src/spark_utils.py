@@ -101,9 +101,6 @@ def process_twitter_batch(batch_df: DataFrame, batch_id: int) -> None:
     batch_df.printSchema()
 
     batch_df = batch_df.withColumn('sentiment', (rand() * 2) - 1)
-
-    # batch_df = batch_df.withColumn('sentiment', sentiment_udf(col('comment')))
-
     batch_df.show(truncate=False)
 
     bucket_name = "twitter-data"
@@ -124,9 +121,6 @@ def process_reddit_batch(batch_df: DataFrame, batch_id: int) -> None:
     batch_df.printSchema()
 
     batch_df = batch_df.withColumn('sentiment', (rand() * 2) - 1)
-    # batch_df = batch_df.withColumn('sentiment', sentiment_udf(col('title')))
-    # batch_df = batch_df.withColumn('sentiment', sentiment_udf(col('title')))
-    # batch_df.withColumn('sentiment', sentiment_udf(batch_df.title))
     batch_df.show(truncate=False)
 
     bucket_name = "reddit-data"

@@ -8,18 +8,25 @@ import urllib.request
 import json
 
 from src.proj_logger import logger
+import os
+
 
 def create_spark_session(app_name: str) -> SparkSession:
     """
     Create and configure a Spark session.
     """
 
+    MINIO_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID') # Axi9u9HiVP0kK9ORyHU0
+    MINIO_SECRET_KEY = os.getenv('AWS_SECRET_ACCESS_KEY') # HA7FSqoHhikv6SpD6GLIMp3LurBFVDzrKdwMFEeS
+
+    if not MINIO_ACCESS_KEY or not MINIO_SECRET_KEY:
+        raise ValueError(f"Minio credentials not found in environment - {MINIO_ACCESS_KEY} - {MINIO_SECRET_KEY}")
     return (
         SparkSession.builder.appName(app_name)
         .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.4,com.redislabs:spark-redis_2.12:3.1.0") 
         .config("spark.hadoop.fs.s3a.endpoint", "http://minio:9000") \
-        .config("spark.hadoop.fs.s3a.access.key", "vdLPy1Qo36MrfwPumKAt") \
-        .config("spark.hadoop.fs.s3a.secret.key", "W0yOZ1T6yEIMgcVLwGANEwbVs4WEqiTzfXVM3XM5") \
+        .config("spark.hadoop.fs.s3a.access.key", MINIO_ACCESS_KEY) \
+        .config("spark.hadoop.fs.s3a.secret.key", MINIO_SECRET_KEY) \
         .config("spark.hadoop.fs.s3a.path.style.access", "true") \
         .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
         .config("spark.redis.host", "redis") \
@@ -65,7 +72,7 @@ def read_kafka_stream(spark: SparkSession, topic: str, schema: StructType) -> Da
     """
     return (
         spark.readStream.format("kafka")
-        .option("kafka.bootstrap.servers", "broker:9092")
+        .option("kafka.bootstrap.servers", "broker:29092")
         .option("subscribe", topic)
         .option("startingOffsets", "earliest")
         .load()

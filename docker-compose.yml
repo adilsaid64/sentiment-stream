@@ -7,11 +7,15 @@ x-spark-common: &spark-common
   command: bin/spark-class org.apache.spark.deploy.worker.Worker ${SPARK_MASTER_URL}
   depends_on:
     - spark-master
+  env_file:
+    - .env
   environment:
     SPARK_MODE: worker
     SPARK_WORKER_CORES: ${SPARK_WORKER_CORES}
     SPARK_WORKER_MEMORY: ${SPARK_WORKER_MEMORY}
     SPARK_MASTER_URL: ${SPARK_MASTER_URL}
+    MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+    MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
   networks:
     - app-network
 
@@ -83,6 +87,11 @@ services:
     image: bitnami/spark:3.2.4
     volumes:
       - ./jobs:/opt/bitnami/spark/jobs
+    env_file:
+      - .env
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
     command: bin/spark-class org.apache.spark.deploy.master.Master
     ports:
       - "9090:8080"
@@ -142,9 +151,8 @@ services:
     ports:
       - "9000:9000" # web console/API
       - "9001:9001" # web admin console
-    environment:
-      MINIO_ROOT_USER: admin
-      MINIO_ROOT_PASSWORD: password
+    env_file:
+      - .env
     command: server /data --console-address ":9001"
     volumes:
       - ./minio/data:/data
@@ -187,10 +195,8 @@ services:
   
   postgres:
     image: postgres:14
-    environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_MULTIPLE_DATABASES=mlflow,airflow
+    env_file:
+      - .env
     ports:
       - "5432:5432"
     volumes:
@@ -209,20 +215,16 @@ services:
   mlflow:
     image: mlflow:latest
     build: ./mlflow
-    container_name: mlflow_server
+    env_file:
+      - .env
     depends_on:
       - postgres
       - minio
     ports:
       - "5001:5001"
-    environment:
-      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
-      - AWS_ACCESS_KEY_ID=ZK0OuSyJBNnnct2Y0TmX
-      - AWS_SECRET_ACCESS_KEY=6zM1yxUQzjxS05EcVjtJ1G2cHW2htuF7J4LDrCzU
-      - MLFLOW_TRACKING_URI=postgresql://admin:password@postgres:5432/mlflow
     networks:
       - app-network
-    command: mlflow server --host 0.0.0.0 --port 5001 --backend-store-uri postgresql://admin:password@postgres:5432/mlflow --default-artifact-root s3://mlflow/
+    command: mlflow server --host 0.0.0.0 --port 5001 --backend-store-uri postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/mlflow --default-artifact-root s3://mlflow/
     restart: always
 
     

@@ -1,15 +1,9 @@
 # sentiment-stream
-An end-to-end real-time data streaming pipeline that leverages Kafka and Spark Streaming to analyze social media sentiment trends. 
-
-Currently  what it does (Without Nginx):
-
-![alt text](images/architecture.png)
-
+An end-to-end real-time data streaming pipeline that leverages Kafka and Spark Streaming to analyse social media sentiment trends. 
 
 What I am building:
 
 ![alt text](images//social-media-sentiment.drawio.png)
-
 
 ## Architecture
 
@@ -37,5 +31,6 @@ What I am building:
 
 
 ## To Run
-   - Ensure Docker is installed and running.
-   - Run `docker-compose up --build` file.
+   - Ensure Docker is installed and running
+   - Some .env config will need to be done, and setting up api keys
+   - Run `docker-compose up --build` file

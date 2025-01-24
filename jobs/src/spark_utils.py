@@ -16,8 +16,8 @@ def create_spark_session(app_name: str) -> SparkSession:
     Create and configure a Spark session.
     """
 
-    MINIO_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID') # Axi9u9HiVP0kK9ORyHU0
-    MINIO_SECRET_KEY = os.getenv('AWS_SECRET_ACCESS_KEY') # HA7FSqoHhikv6SpD6GLIMp3LurBFVDzrKdwMFEeS
+    MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY')
+    MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY')
 
     if not MINIO_ACCESS_KEY or not MINIO_SECRET_KEY:
         raise ValueError(f"Minio credentials not found in environment - {MINIO_ACCESS_KEY} - {MINIO_SECRET_KEY}")
@@ -123,10 +123,10 @@ def process_reddit_batch(batch_df: DataFrame, batch_id: int) -> None:
     logger.info(f"Processing Batch ID: {batch_id} with {batch_df.count()} records")
     batch_df.printSchema()
 
-    # batch_df = batch_df.withColumn('sentiment', (rand() * 2) - 1)
+    batch_df = batch_df.withColumn('sentiment', (rand() * 2) - 1)
     # batch_df = batch_df.withColumn('sentiment', sentiment_udf(col('title')))
     # batch_df = batch_df.withColumn('sentiment', sentiment_udf(col('title')))
-    batch_df.withColumn('sentiment', sentiment_udf(batch_df.title))
+    # batch_df.withColumn('sentiment', sentiment_udf(batch_df.title))
     batch_df.show(truncate=False)
 
     bucket_name = "reddit-data"
@@ -136,7 +136,6 @@ def process_reddit_batch(batch_df: DataFrame, batch_id: int) -> None:
     logger.info(f'Wrote {batch_id} to Redis')
 
     write_to_redis_with_timestamp(batch_df=batch_df, table_name='reddit_mean', sentiment_column = 'sentiment')
-
     
     logger.info(f"Batch {batch_id} Processsed")
 

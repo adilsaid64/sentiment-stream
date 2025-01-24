@@ -4,7 +4,7 @@ echo "Waiting for Kafka to be ready..."
 sleep 10
 
 kafka-topics \
-    --bootstrap-server broker:9092 \
+    --bootstrap-server broker:29092 \
     --create \
     --if-not-exists \
     --topic reddit \
@@ -15,7 +15,7 @@ kafka-topics \
 
 
 kafka-topics \
-    --bootstrap-server broker:9092 \
+    --bootstrap-server broker:29092 \
     --create \
     --if-not-exists \
     --topic twitter \
@@ -26,7 +26,7 @@ kafka-topics \
 
 
 kafka-topics \
-    --bootstrap-server broker:9092 \
+    --bootstrap-server broker:29092 \
     --create \
     --if-not-exists \
     --topic processed-data \
@@ -37,4 +37,4 @@ kafka-topics \
 
 echo "Successfully created topics:"
 
-kafka-topics --bootstrap-server broker:9092 --list
+kafka-topics --bootstrap-server broker:29092 --list

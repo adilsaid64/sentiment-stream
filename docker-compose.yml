@@ -169,16 +169,9 @@ services:
     container_name: minio-init
     depends_on:
       minio:
-        condition: service_healthy  # Ensures MinIO is ready
+        condition: service_healthy # Ensures MinIO is ready
     entrypoint: >
-      /bin/sh -c "
-      echo 'Waiting for MinIO...';
-      mc alias set myminio http://minio:9000 admin password;
-      mc mb myminio/reddit-data;
-      mc mb myminio/twitter-data;
-      mc mb myminio/mlflow;
-      echo 'Buckets created!';
-      exit 0;"
+      /bin/sh -c " echo 'Waiting for MinIO...'; mc alias set myminio http://minio:9000 admin password; mc mb myminio/reddit-data; mc mb myminio/twitter-data; mc mb myminio/mlflow; echo 'Buckets created!'; exit 0;"
     networks:
       - app-network
 
@@ -192,7 +185,7 @@ services:
     restart: always
     networks:
       - app-network
-  
+
   postgres:
     image: postgres:14
     env_file:
@@ -200,7 +193,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - ./postgres:/var/lib/postgresql/data
     networks:
       - app-network
     command: >
@@ -211,7 +204,7 @@ services:
         psql -U $$POSTGRES_USER -tc \"SELECT 1 FROM pg_database WHERE datname = 'airflow'\" | grep -q 1 || echo \"CREATE DATABASE airflow;\" | psql -U $$POSTGRES_USER &&
         wait"
     restart: always
-  
+
   mlflow:
     image: mlflow:latest
     build: ./mlflow
@@ -227,6 +220,5 @@ services:
     command: mlflow server --host 0.0.0.0 --port 5001 --backend-store-uri postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/mlflow --default-artifact-root s3://mlflow/
     restart: always
 
-    
 networks:
   app-network:

@@ -168,6 +168,7 @@ services:
       mc alias set myminio http://minio:9000 admin password;
       mc mb myminio/reddit-data;
       mc mb myminio/twitter-data;
+      mc mb myminio/mlflow;
       echo 'Buckets created!';
       exit 0;"
     networks:
@@ -183,6 +184,47 @@ services:
     restart: always
     networks:
       - app-network
+  
+  postgres:
+    image: postgres:14
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_MULTIPLE_DATABASES=mlflow,airflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    command: >
+      bash -c "
+        docker-entrypoint.sh postgres &
+        sleep 5 &&
+        psql -U $$POSTGRES_USER -tc \"SELECT 1 FROM pg_database WHERE datname = 'mlflow'\" | grep -q 1 || echo \"CREATE DATABASE mlflow;\" | psql -U $$POSTGRES_USER &&
+        psql -U $$POSTGRES_USER -tc \"SELECT 1 FROM pg_database WHERE datname = 'airflow'\" | grep -q 1 || echo \"CREATE DATABASE airflow;\" | psql -U $$POSTGRES_USER &&
+        wait"
+    restart: always
+  
+  mlflow:
+    image: mlflow:latest
+    build: ./mlflow
+    container_name: mlflow_server
+    depends_on:
+      - postgres
+      - minio
+    ports:
+      - "5001:5001"
+    environment:
+      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
+      - AWS_ACCESS_KEY_ID=ZK0OuSyJBNnnct2Y0TmX
+      - AWS_SECRET_ACCESS_KEY=6zM1yxUQzjxS05EcVjtJ1G2cHW2htuF7J4LDrCzU
+      - MLFLOW_TRACKING_URI=postgresql://admin:password@postgres:5432/mlflow
+    networks:
+      - app-network
+    command: mlflow server --host 0.0.0.0 --port 5001 --backend-store-uri postgresql://admin:password@postgres:5432/mlflow --default-artifact-root s3://mlflow/
+    restart: always
 
+    
 networks:
   app-network:

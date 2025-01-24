@@ -156,6 +156,23 @@ services:
       timeout: 10s
       retries: 3
 
+  minio-init:
+    image: minio/mc:latest
+    container_name: minio-init
+    depends_on:
+      minio:
+        condition: service_healthy  # Ensures MinIO is ready
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Waiting for MinIO...';
+      mc alias set myminio http://minio:9000 admin password;
+      mc mb myminio/reddit-data;
+      mc mb myminio/twitter-data;
+      echo 'Buckets created!';
+      exit 0;"
+    networks:
+      - app-network
+
   redis:
     image: redis:latest
     ports:

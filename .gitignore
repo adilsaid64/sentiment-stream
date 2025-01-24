@@ -6,3 +6,4 @@ __pycache__**
 command.txt
 minio
 redis
+postgres_data

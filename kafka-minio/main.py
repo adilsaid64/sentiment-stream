@@ -1,0 +1,1 @@
+# Service to consume data from kafka to then store in minio

@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.functions import from_json, col, udf, rand, current_timestamp, concat_ws, randn
+from pyspark.sql.functions import from_json, col, to_json, rand, current_timestamp, concat_ws, struct
 from pyspark.sql.types import StructType, StructField, StringType, LongType, FloatType
 import pyspark.sql.functions as f
 
@@ -91,27 +91,35 @@ def fetch_sentiment(text: str) -> float:
             return float(data["sentiment"])
     except Exception as e:
         print(f"Error fetching sentiment: {e}")
-        return 0.0  # Default neutral sentiment
-
-sentiment_udf = udf(fetch_sentiment, FloatType())
-
+        return 0.0 
+# fetch_sentiment_udf = udf(fetch_sentiment, FloatType())
 
 def process_twitter_batch(batch_df: DataFrame, batch_id: int) -> None:
     logger.info(f"Processing Batch ID: {batch_id} with {batch_df.count()} records")
     batch_df.printSchema()
 
     batch_df = batch_df.withColumn('sentiment', (rand() * 2) - 1)
+
     batch_df.show(truncate=False)
 
-    bucket_name = "twitter-data"
-    write_to_bucket(batch_df=batch_df, bucket_name=bucket_name)
-    logger.info(f'Wrote {batch_id} to S3')
+    batch_df = batch_df.select(to_json(struct([col(c) for c in batch_df.columns])).alias("value"))
 
-    write_to_redis(batch_df=batch_df, table_name= 'twitter', id_column='id')
-    logger.info(f'Wrote {batch_id} to Redis')
+    kafka_topic="processed-data"
+    batch_df.write \
+        .format("kafka") \
+        .option("kafka.bootstrap.servers", "broker:29092") \
+        .option("topic", kafka_topic) \
+        .save()
+
+    # bucket_name = "twitter-data"
+    # write_to_bucket(batch_df=batch_df, bucket_name=bucket_name)
+    # logger.info(f'Wrote {batch_id} to S3')
+
+    # write_to_redis(batch_df=batch_df, table_name= 'twitter', id_column='id')
+    # logger.info(f'Wrote {batch_id} to Redis')
 
 
-    write_to_redis_with_timestamp(batch_df=batch_df, table_name='twitter_mean', sentiment_column = 'sentiment')
+    # write_to_redis_with_timestamp(batch_df=batch_df, table_name='twitter_mean', sentiment_column = 'sentiment')
 
     logger.info(f"Batch {batch_id} Processsed")
 
@@ -123,13 +131,22 @@ def process_reddit_batch(batch_df: DataFrame, batch_id: int) -> None:
     batch_df = batch_df.withColumn('sentiment', (rand() * 2) - 1)
     batch_df.show(truncate=False)
 
-    bucket_name = "reddit-data"
-    write_to_bucket(batch_df=batch_df, bucket_name=bucket_name)
+    batch_df = batch_df.select(to_json(struct([col(c) for c in batch_df.columns])).alias("value"))
 
-    write_to_redis(batch_df=batch_df, table_name= 'reddit', id_column='id')
-    logger.info(f'Wrote {batch_id} to Redis')
+    kafka_topic="processed-data"
+    batch_df.write \
+        .format("kafka") \
+        .option("kafka.bootstrap.servers", "broker:29092") \
+        .option("topic", kafka_topic) \
+        .save()
 
-    write_to_redis_with_timestamp(batch_df=batch_df, table_name='reddit_mean', sentiment_column = 'sentiment')
+    # bucket_name = "reddit-data"
+    # write_to_bucket(batch_df=batch_df, bucket_name=bucket_name)
+
+    # write_to_redis(batch_df=batch_df, table_name= 'reddit', id_column='id')
+    # logger.info(f'Wrote {batch_id} to Redis')
+
+    # write_to_redis_with_timestamp(batch_df=batch_df, table_name='reddit_mean', sentiment_column = 'sentiment')
     
     logger.info(f"Batch {batch_id} Processsed")
 
@@ -168,3 +185,20 @@ def write_to_redis_with_timestamp(batch_df: DataFrame, table_name: str, sentimen
      .option("key.column", "composite_key")
      .save(mode="append")
     )
+
+def write_to_kafka(batch_df: DataFrame, kafka_topic: str, bootstrap_servers: str = "broker:29092") -> None:
+    """Writes a Spark DataFrame to a Kafka topic."""
+    batch_df_json = batch_df.selectExpr("to_json(struct(*)) AS value")
+
+    query = (
+        batch_df_json.writeStream
+        .format("kafka")
+        .option("kafka.bootstrap.servers", bootstrap_servers)
+        .option("topic", kafka_topic)
+        .option("checkpointLocation", "/tmp/kafka-checkpoint")
+        .start()
+    )
+
+    query.awaitTermination()
+
+    logger.info(f"Data successfully written to Kafka topic: {kafka_topic}")

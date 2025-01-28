@@ -1,5 +1,5 @@
 from src.proj_logger import logger
-from src.context import DataFetcher, MessageProducer
+from src.context import DataFetcher, MessageProducer, MessageConsumer
 
 import json
 import time
@@ -10,3 +10,9 @@ def stream_data(data_fetcher:DataFetcher, message_producer:MessageProducer, slee
         logger.info(message)
         message_producer.push(message)
         if sleep_time_s>0:time.sleep(sleep_time_s)
+
+
+def consume_data(message_consumer):
+    for subission in message_consumer.consume():
+        message = json.dumps(subission)
+        logger.info(message)

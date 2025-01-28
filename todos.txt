@@ -1,0 +1,3 @@
+- connect kafka-minio consumer
+- write mlflow training job. Create the job a a project, then call the execution of that training jobs via airlow?
+- 

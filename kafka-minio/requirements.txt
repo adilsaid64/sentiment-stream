@@ -20,3 +20,4 @@ urllib3==2.2.3
 websocket-client==1.8.0
 textblob==0.18.0.post0
 kafka-python
+boto3

@@ -15,3 +15,10 @@ class MessageProducerStrategy(ABC):
     def send_message(self, message):
         """Send message to message broker"""
         pass
+
+class MessageConsumerStrategy(ABC):
+    """Interface for consuming messages from a message broker"""
+
+    @abstractmethod
+    def consume_message(self):
+        pass

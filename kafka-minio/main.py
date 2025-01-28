@@ -27,6 +27,4 @@ if __name__ == "__main__":
 
     consumer = MessageConsumer(KafkaConsumerStrategy(topic = TOPIC, bootstrap_servers=BOOTSTRAP_SERVERS, group_id=GROUP_ID))
 
-    # need a way that a message consumer can generate messages, then I need a nice api to then store that messsage into some type of storage or db. use boto3 directly, functional way?
-
-    consume_data_send_to_bucket(consumer, s3_client, BUCKET_NAME) # then this needs to be stored in minio via the boto3 api 
+    consume_data_send_to_bucket(consumer, s3_client, BUCKET_NAME)

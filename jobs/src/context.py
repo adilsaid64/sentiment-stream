@@ -1,4 +1,4 @@
-from src.interface import FetchStrategy, MessageProducerStrategy
+from src.interface import FetchStrategy, MessageProducerStrategy, MessageConsumerStrategy
 
 class DataFetcher:
     def __init__(self, strategy:FetchStrategy):
@@ -13,3 +13,11 @@ class MessageProducer:
 
     def push(self, message:dict):
         self.strategy.send_message(message)
+
+
+class MessageConsumer:
+    def __init__(self, strategy: MessageConsumerStrategy):
+        self.strategy = strategy
+
+    def consume(self):
+        return self.strategy.consume_message()

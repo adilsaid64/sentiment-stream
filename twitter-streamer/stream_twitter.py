@@ -6,10 +6,8 @@ from src.kafka_producer import KafkaProducer
 from src.utils import stream_data
 from src.context import  DataFetcher, MessageProducer
 
-
 if __name__ == "__main__":
 
-    
     load_dotenv()
     
     twitter_fetcher = DataFetcher(TwitterFetcher(df = pd.read_csv('data/twitter_dataset.csv')))

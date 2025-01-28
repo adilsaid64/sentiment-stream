@@ -10,4 +10,6 @@ RUN python -m venv venv && \
 
 COPY main.py .
 
+ENV PYTHONPATH="/app/src:$PYTHONPATH"
+
 CMD ["venv/bin/python", "main.py"]

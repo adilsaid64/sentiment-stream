@@ -234,5 +234,15 @@ services:
       minio:
         condition: service_healthy
 
+  etl-data-aggregator:
+    build: ./etl-data-aggregator
+    volumes:
+      - ./jobs/src:/app/src
+    env_file:
+      - .env
+    networks:
+      - app-network
+    
+
 networks:
   app-network:

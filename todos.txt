@@ -1,0 +1,6 @@
+Each runs on its own docker container - then to use airflow to orchestrate using the Docker operator. 
+- write an etl job to aggregate data from reddit and twitter into a training, val, testing set which will be stored in an bucket
+- write an mlflow project training job that usses the output of the etl process to train, val test then log the model and job to mlflow.
+
+Reason: 
+- This abstracts the work of the etl and the work of training away from the actual orchestration

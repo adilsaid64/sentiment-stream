@@ -171,7 +171,7 @@ services:
       minio:
         condition: service_healthy # Ensures MinIO is ready
     entrypoint: >
-      /bin/sh -c " echo 'Waiting for MinIO...'; mc alias set myminio http://minio:9000 admin password; mc mb myminio/reddit-data; mc mb myminio/twitter-data; mc mb myminio/mlflow; echo 'Buckets created!'; exit 0;"
+      /bin/sh -c " echo 'Waiting for MinIO...'; mc alias set myminio http://minio:9000 admin password; mc mb myminio/reddit-data; mc mb myminio/twitter-data; mc mb myminio/mlflow; mc mb myminio/processed-data; echo 'Buckets created!'; exit 0;"
     networks:
       - app-network
 
@@ -219,6 +219,33 @@ services:
       - app-network
     command: mlflow server --host 0.0.0.0 --port 5001 --backend-store-uri postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/mlflow --default-artifact-root s3://mlflow/
     restart: always
+
+  kafka-minio:
+    build: ./kafka-minio
+    volumes:
+      - ./jobs/src:/app/src
+    env_file:
+      - .env
+    networks:
+      - app-network
+    depends_on:
+      broker:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
+  etl-data-aggregator:
+    build: ./etl-data-aggregator
+    volumes:
+      - ./jobs/src:/app/src
+    env_file:
+      - .env
+    networks:
+      - app-network
+    depends_on:
+      minio:
+        condition: service_healthy
+    
 
 networks:
   app-network:

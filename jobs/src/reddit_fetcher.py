@@ -5,6 +5,18 @@ import json
 from dotenv import load_dotenv
 import os
 
+
+from typing import TypedDict
+
+
+class RedditPost(TypedDict):
+    title: str
+    id: str
+    url: str
+    created_utc: float
+    selftext: str
+    now_time: float
+
 class RedditFetcher(FetchStrategy):
     def __init__(self, client_id:str, client_secret:str, user_agent:str, subreddit:str):
         self.reddit = praw.Reddit(
@@ -15,7 +27,7 @@ class RedditFetcher(FetchStrategy):
         self.subreddit = subreddit
 
 
-    def fetch_data(self):
+    def fetch_data(self)->RedditPost:
         subreddit = self.reddit.subreddit(self.subreddit)
         for submission in subreddit.stream.submissions(skip_existing = True):
             yield{

@@ -11,9 +11,9 @@ import boto3
 if __name__ == "__main__":
     load_dotenv()
 
-    MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "http://localhost:9000")
-    MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY")
-    MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY")
+    MINO_ENDPOINT : str = os.getenv("MINIO_ENDPOINT", "http://localhost:9000")
+    MINIO_ACCESS_KEY : str = os.getenv("MINIO_ACCESS_KEY")
+    MINIO_SECRET_KEY : str = os.getenv("MINIO_SECRET_KEY")
 
 
     BUCKET_NAME : str = ""
@@ -31,4 +31,4 @@ if __name__ == "__main__":
     
     output : List[Dict[str, str]] = s3_fetcher.fetch()
 
-
+I

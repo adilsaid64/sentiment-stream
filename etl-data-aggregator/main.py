@@ -11,17 +11,17 @@ import boto3
 if __name__ == "__main__":
     load_dotenv()
 
-    MINO_ENDPOINT : str = os.getenv("MINIO_ENDPOINT", "http://localhost:9000")
+    MINO_ENDPOINT : str = os.getenv("MINIO_ENDPOINT", "http://minio:9000")
     MINIO_ACCESS_KEY : str = os.getenv("MINIO_ACCESS_KEY")
     MINIO_SECRET_KEY : str = os.getenv("MINIO_SECRET_KEY")
 
 
-    BUCKET_NAME : str = ""
-    PREFIX : Optional[str] = None
+    BUCKET_NAME : str = "processed-data"
+    PREFIX : Optional[str] = "output/json_data"
 
     s3_client = boto3.client(
         "s3",
-        endpoint_url=MINIO_ENDPOINT,
+        endpoint_url=MINO_ENDPOINT,
         aws_access_key_id=MINIO_ACCESS_KEY,
         aws_secret_access_key=MINIO_SECRET_KEY)
     
@@ -31,4 +31,5 @@ if __name__ == "__main__":
     
     output : List[Dict[str, str]] = s3_fetcher.fetch()
 
-I
+
+    print(output)

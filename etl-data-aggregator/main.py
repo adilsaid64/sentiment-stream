@@ -2,8 +2,8 @@ import os
 from typing import Optional, Dict, List
 import time
 
-from s3_fetcher import S3Fetcher
-from context import  DataFetcher
+from src.s3_fetcher import S3Fetcher
+from src.context import  DataFetcher
 
 from dotenv import load_dotenv
 import boto3

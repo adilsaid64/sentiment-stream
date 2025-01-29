@@ -242,6 +242,9 @@ services:
       - .env
     networks:
       - app-network
+    depends_on:
+      minio:
+        condition: service_healthy
     
 
 networks:

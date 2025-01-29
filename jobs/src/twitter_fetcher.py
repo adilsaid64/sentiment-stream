@@ -9,7 +9,7 @@ from src.proj_logger import logger
 from typing import TypedDict
 
 
-class TwitterData(TypedDict):
+class TwitterPost(TypedDict):
     id: str
     username: str
     comment: str
@@ -19,7 +19,7 @@ class TwitterFetcher(FetchStrategy):
     def __init__(self, df:pd.DataFrame):
         self.df : pd.DataFrame = df.sample(frac =1) # this shuffles the data
         
-    def fetch_data(self)->TwitterData:
+    def fetch_data(self)->TwitterPost:
         while True:   
             for index, row in self.df.iterrows():
                 yield {

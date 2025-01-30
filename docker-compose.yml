@@ -26,9 +26,8 @@ services:
     container_name: zookeeper
     ports:
       - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT}
-      ZOOKEEPER_TICK_TIME: ${ZOOKEEPER_TICK_TIME}
+    env_file:
+      - .env
     healthcheck:
       test: [ 'CMD', 'bash', '-c', "echo 'ruok' | nc localhost ${ZOOKEEPER_CLIENT_PORT}" ]
       interval: 10s
@@ -245,7 +244,6 @@ services:
     depends_on:
       minio:
         condition: service_healthy
-    
 
 networks:
   app-network:

@@ -1,7 +1,7 @@
 from src.interface import FetchStrategy
 import boto3
 from botocore.client import BaseClient
-
+import json
 
 from typing import Optional, Dict, List
 
@@ -25,7 +25,7 @@ class S3Fetcher(FetchStrategy):
             key : str = obj['Key']
             file_obj = self._s3_client.get_object(Bucket=self.bucket_name, Key=key)
             file_content = file_obj['Body'].read().decode('utf-8')
-            objects.append({"Key": key, "Content": file_content})
+            objects.append(json.loads(file_content))
             
         return objects
     

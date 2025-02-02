@@ -170,7 +170,7 @@ services:
       minio:
         condition: service_healthy # Ensures MinIO is ready
     entrypoint: >
-      /bin/sh -c " echo 'Waiting for MinIO...'; mc alias set myminio http://minio:9000 admin password; mc mb myminio/reddit-data; mc mb myminio/twitter-data; mc mb myminio/mlflow; mc mb myminio/processed-data; echo 'Buckets created!'; exit 0;"
+      /bin/sh -c " echo 'Waiting for MinIO...'; mc alias set myminio http://minio:9000 admin password; mc mb myminio/reddit-data; mc mb myminio/twitter-data; mc mb myminio/mlflow; mc mb myminio/processed-data; mc mb myminio/zenml; echo 'Buckets created!'; exit 0;"
     networks:
       - app-network
 
@@ -201,17 +201,24 @@ services:
         until pg_isready -U $$POSTGRES_USER -h localhost; do sleep 2; done &&
         psql -U $$POSTGRES_USER -tc \"SELECT 1 FROM pg_database WHERE datname = 'mlflow'\" | grep -q 1 || echo \"CREATE DATABASE mlflow;\" | psql -U $$POSTGRES_USER &&
         psql -U $$POSTGRES_USER -tc \"SELECT 1 FROM pg_database WHERE datname = 'airflow'\" | grep -q 1 || echo \"CREATE DATABASE airflow;\" | psql -U $$POSTGRES_USER &&
+        psql -U $$POSTGRES_USER -tc \"SELECT 1 FROM pg_database WHERE datname = 'zenml'\" | grep -q 1 || echo \"CREATE DATABASE zenml;\" | psql -U $$POSTGRES_USER &&
         wait"
     restart: always
-
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER -h localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   mlflow:
     image: mlflow:latest
     build: ./mlflow
     env_file:
       - .env
     depends_on:
-      - postgres
-      - minio
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
     ports:
       - "5001:5001"
     networks:
@@ -242,6 +249,19 @@ services:
     networks:
       - app-network
     depends_on:
+      minio:
+        condition: service_healthy
+  zenml:
+    image: zenmldocker/zenml-server:latest
+    ports:
+      - "8082:8080"
+    env_file:
+      - .env
+    networks:
+      - app-network
+    depends_on:
+      postgres:
+        condition: service_healthy
       minio:
         condition: service_healthy
 

@@ -41,7 +41,7 @@ if __name__ == "__main__":
     
     output : List[Dict[str, str]] = s3_fetcher.fetch()
 
-    csv_buffer = pd.DataFrame(output).to_csv(index=False).encode()
+    csv_buffer : bytes = pd.DataFrame(output).to_csv(index=False).encode()
 
     s3_client.put_object(
         Bucket=SOURCE_BUCKET,

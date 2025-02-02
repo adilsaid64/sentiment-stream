@@ -1,6 +1,10 @@
+Create a Python package for src. Then Host the package using https://pypi.org/project/pypiserver/ . pypiserver Can be hosted via a docker.
+Create a build script, so whenever rebuilding the containers, it pip installs the latest version of the package
+
+
 Each runs on its own docker container - then to use airflow to orchestrate using the Docker operator. 
-- write an etl job to aggregate data from reddit and twitter into a training, val, testing set which will be stored in an bucket
-- write an mlflow project training job that usses the output of the etl process to train, val test then log the model and job to mlflow.
+- write an etl job to aggregate data from reddit and twitter into a training, val, testing set which will be stored in an bucket - DONE
+- Write a workflow with ZenML that uses MLFlow and Docker
 
 Reason: 
 - This abstracts the work of the etl and the work of training away from the actual orchestration

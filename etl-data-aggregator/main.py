@@ -3,6 +3,8 @@ from typing import Optional, Dict, List
 import time
 from datetime import datetime
 
+# TODO: package src into a python package, then have that pip installed into this container
+# This will get rid of this weird mounting volumes and then importing frm src
 from src.s3_fetcher import S3Fetcher
 from src.context import  DataFetcher
 

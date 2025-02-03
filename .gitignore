@@ -9,3 +9,6 @@ minio
 redis
 postgres_data
 postgres
+jobs/build
+jobs/dist
+jobs/src/my_package.egg-info

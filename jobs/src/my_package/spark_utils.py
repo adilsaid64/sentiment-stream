@@ -7,7 +7,7 @@ import datetime
 import urllib.request
 import json
 
-from src.proj_logger import logger
+from src.my_package.proj_logger import logger
 import os
 
 

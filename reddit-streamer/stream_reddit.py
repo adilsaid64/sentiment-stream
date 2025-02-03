@@ -1,7 +1,7 @@
-from src.reddit_fetcher import RedditFetcher
-from src.kafka_producer import KafkaProducer
-from src.utils import stream_data
-from src.context import  DataFetcher, MessageProducer
+from src.my_package.reddit_fetcher import RedditFetcher
+from src.my_package.kafka_producer import KafkaProducer
+from src.my_package.utils import stream_data
+from src.my_package.context import  DataFetcher, MessageProducer
 from dotenv import load_dotenv
 import os
 import pandas as pd

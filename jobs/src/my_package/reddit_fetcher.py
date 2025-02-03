@@ -1,11 +1,9 @@
-from src.interface import FetchStrategy
+from src.my_package.interface import FetchStrategy
 import praw
 import datetime
 import json
 from dotenv import load_dotenv
 import os
-
-
 from typing import TypedDict
 
 

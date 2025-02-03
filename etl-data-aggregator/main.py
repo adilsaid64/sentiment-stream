@@ -5,10 +5,10 @@ from datetime import datetime
 
 # TODO: package src into a python package, then have that pip installed into this container
 # This will get rid of this weird mounting volumes and then importing frm src
-from src.s3_fetcher import S3Fetcher
-from src.context import  DataFetcher
+from src.my_package.s3_fetcher import S3Fetcher
+from src.my_package.context import  DataFetcher
 
-from src.proj_logger import logger
+from src.my_package.proj_logger import logger
 
 
 from dotenv import load_dotenv

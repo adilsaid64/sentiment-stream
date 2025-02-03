@@ -1,13 +1,13 @@
-from src.interface import FetchStrategy
+# We wont be using the real twitter api here,but mock streaming data from a csv
+# This is to provide an illustration of how we could have multiple data sources.
+
+from src.my_package.interface import FetchStrategy
+from src.my_package.proj_logger import logger
+
 import pandas as pd
 import datetime
 import uuid
-# We wont be using the real twitter api here,but mock streaming data from a csv
-# This is to provide an illustration of how we could have multiple data sources.
-from src.proj_logger import logger
-
 from typing import TypedDict
-
 
 class TwitterPost(TypedDict):
     id: str

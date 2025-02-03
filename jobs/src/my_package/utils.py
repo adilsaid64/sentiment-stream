@@ -1,7 +1,7 @@
 from typing import Callable
 import datetime
-from src.proj_logger import logger
-from src.context import DataFetcher, MessageProducer, MessageConsumer
+from src.my_package.proj_logger import logger
+from src.my_package.context import DataFetcher, MessageProducer, MessageConsumer
 
 import json
 import time

@@ -1,8 +1,7 @@
-from src.interface import FetchStrategy
+from src.my_package.interface import FetchStrategy
 import boto3
 from botocore.client import BaseClient
 import json
-
 from typing import Optional, Dict, List
 
 class S3Fetcher(FetchStrategy):

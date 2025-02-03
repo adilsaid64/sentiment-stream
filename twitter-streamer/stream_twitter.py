@@ -1,10 +1,10 @@
 from dotenv import load_dotenv
 import pandas as pd
 
-from src.twitter_fetcher import TwitterFetcher
-from src.kafka_producer import KafkaProducer
-from src.utils import stream_data
-from src.context import  DataFetcher, MessageProducer
+from src.my_package.twitter_fetcher import TwitterFetcher
+from src.my_package.kafka_producer import KafkaProducer
+from src.my_package.utils import stream_data
+from src.my_package.context import  DataFetcher, MessageProducer
 
 if __name__ == "__main__":
 

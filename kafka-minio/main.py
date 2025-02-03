@@ -1,6 +1,6 @@
-from src.kafka_consumer import KafkaConsumerStrategy
-from src.context import MessageConsumer
-from src.utils import consume_data_send_to_bucket
+from src.my_package.kafka_consumer import KafkaConsumerStrategy
+from src.my_package.context import MessageConsumer
+from src.my_package.utils import consume_data_send_to_bucket
 import boto3
 from botocore.client import Config
 import os

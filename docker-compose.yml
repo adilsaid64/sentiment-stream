@@ -3,7 +3,7 @@ version: '3'
 x-spark-common: &spark-common
   image: bitnami/spark:3.2.4
   volumes:
-    - ./jobs:/opt/bitnami/spark/jobs
+    - ./project-core:/opt/bitnami/spark/jobs
   command: bin/spark-class org.apache.spark.deploy.worker.Worker ${SPARK_MASTER_URL}
   depends_on:
     - spark-master
@@ -85,7 +85,7 @@ services:
   spark-master:
     image: bitnami/spark:3.2.4
     volumes:
-      - ./jobs:/opt/bitnami/spark/jobs
+      - ./project-core:/opt/bitnami/spark/jobs
     env_file:
       - .env
     environment:
@@ -101,7 +101,7 @@ services:
   twitter-streamer-1:
     build: ./twitter-streamer
     volumes:
-      - ./jobs/src:/app/src
+      - ./project-core/src:/app/src
     env_file:
       - .env
     networks:
@@ -112,7 +112,7 @@ services:
   reddit-streamer-1:
     build: ./reddit-streamer
     volumes:
-      - ./jobs/src:/app/src
+      - ./project-core/src:/app/src
     env_file:
       - .env
     networks:
@@ -229,7 +229,7 @@ services:
   kafka-minio:
     build: ./kafka-minio
     volumes:
-      - ./jobs/src:/app/src
+      - ./project-core/src:/app/src
     env_file:
       - .env
     networks:
@@ -243,7 +243,7 @@ services:
   etl-data-aggregator:
     build: ./etl-data-aggregator
     volumes:
-      - ./jobs/src:/app/src
+      - ./project-core/src:/app/src
     env_file:
       - .env
     networks:

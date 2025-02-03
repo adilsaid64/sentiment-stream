@@ -1,5 +1,13 @@
 Create a Python package for src. Then Host the package using https://pypi.org/project/pypiserver/ . pypiserver Can be hosted via a docker.
 Create a build script, so whenever rebuilding the containers, it pip installs the latest version of the package
+- STEPS:
+- Setup src as a package DONE
+- Fix the containers that use src, fixing the imports DONE
+- Create a build of the pacakge and try to install locally in local env DONE
+- Setup a private pypy server? or just keep the build on a share volume. Then just pip install that? 
+- Rename the jobs folder to something more meaning full
+- Create a pipelines folder within that more meaning folder
+- Move the pipeline scripts inso that pipeline folder
 
 
 Each runs on its own docker container - then to use airflow to orchestrate using the Docker operator. 

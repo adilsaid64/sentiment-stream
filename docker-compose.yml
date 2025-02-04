@@ -225,6 +225,12 @@ services:
       - app-network
     command: mlflow server --host 0.0.0.0 --port 5001 --backend-store-uri postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/mlflow --default-artifact-root s3://mlflow/
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/2.0/mlflow/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   kafka-minio:
     build: ./kafka-minio
@@ -264,6 +270,12 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 networks:
   app-network:

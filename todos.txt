@@ -16,3 +16,26 @@ Each runs on its own docker container - then to use airflow to orchestrate using
 
 Reason: 
 - This abstracts the work of the etl and the work of training away from the actual orchestration
+
+
+# Notes
+
+
+## ZenML
+
+zenml init --template starter     
+
+1. Register MLFlow as an experiment tracker
+zenml experiment-tracker register mlflow_tracker \
+    --flavor=mlflow \
+    --tracking_uri=http://localhost:5001 \
+    --tracking_username=dummy \
+
+2. creating a new zenml stack that uses mlflow tracker, and it should connect to minio and postgres
+
+Need to change artifact and metadata stores to minio (s3) and postgres
+
+zenml stack register mlflow_stack \
+    -o default \
+    -a default \
+    -e mlflow_tracker

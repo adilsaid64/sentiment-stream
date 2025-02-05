@@ -4,8 +4,7 @@ import datetime
 import json
 from dotenv import load_dotenv
 import os
-from typing import TypedDict
-
+from typing import TypedDict, Generator
 
 class RedditPost(TypedDict):
     title: str
@@ -25,7 +24,7 @@ class RedditFetcher(FetchStrategy):
         self.subreddit = subreddit
 
 
-    def fetch_data(self)->RedditPost:
+    def fetch_data(self)->Generator[RedditPost, None, None]:
         subreddit = self.reddit.subreddit(self.subreddit)
         for submission in subreddit.stream.submissions(skip_existing = True):
             yield{

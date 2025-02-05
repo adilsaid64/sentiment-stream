@@ -7,7 +7,7 @@ from src.my_package.proj_logger import logger
 import pandas as pd
 import datetime
 import uuid
-from typing import TypedDict
+from typing import TypedDict, Generator
 
 class TwitterPost(TypedDict):
     id: str
@@ -19,7 +19,7 @@ class TwitterFetcher(FetchStrategy):
     def __init__(self, df:pd.DataFrame):
         self.df : pd.DataFrame = df.sample(frac =1) # this shuffles the data
         
-    def fetch_data(self)->TwitterPost:
+    def fetch_data(self)->Generator[TwitterPost, None, None]:
         while True:   
             for index, row in self.df.iterrows():
                 yield {

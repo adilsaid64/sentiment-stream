@@ -1,4 +1,4 @@
-from src.my_package.interface import FetchStrategy
+from .interface import FetchStrategy
 import praw
 import datetime
 import json

@@ -1,5 +1,6 @@
-from src.my_package.interface import MessageProducerStrategy
-from src.my_package.proj_logger import logger
+from .interface import MessageProducerStrategy
+from .proj_logger import logger
+
 from confluent_kafka import Producer
 from confluent_kafka.admin import AdminClient, NewTopic
 

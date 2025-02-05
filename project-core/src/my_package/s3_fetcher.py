@@ -1,4 +1,4 @@
-from src.my_package.interface import FetchStrategy
+from .interface import FetchStrategy
 import boto3
 from botocore.client import BaseClient
 import json

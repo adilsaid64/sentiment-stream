@@ -1,4 +1,4 @@
-from src.my_package.interface import FetchStrategy, MessageProducerStrategy, MessageConsumerStrategy
+from .interface import FetchStrategy, MessageProducerStrategy, MessageConsumerStrategy
 
 class DataFetcher:
     def __init__(self, strategy:FetchStrategy):

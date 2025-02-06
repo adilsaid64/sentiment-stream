@@ -6,7 +6,7 @@ from .context import DataFetcher, MessageProducer, MessageConsumer
 import json
 import time
 
-def stream_data(data_fetcher:DataFetcher, message_producer:MessageProducer, sleep_time_s : int = 0):
+def stream_data(data_fetcher:DataFetcher, message_producer:MessageProducer, sleep_time_s : int = 0) -> None:
     for submission in data_fetcher.fetch():
         message = json.dumps(submission)
         logger.info(message)
@@ -14,7 +14,7 @@ def stream_data(data_fetcher:DataFetcher, message_producer:MessageProducer, slee
         if sleep_time_s>0:time.sleep(sleep_time_s)
 
 
-def consume_data_send_to_bucket(message_consumer:MessageConsumer, s3_client, bucket_name):
+def consume_data_send_to_bucket(message_consumer:MessageConsumer, s3_client, bucket_name) -> None:
     for submission in message_consumer.consume():
         message_str = submission.decode('utf-8')
         message = json.loads(message_str)

@@ -4,8 +4,7 @@ import pandas as pd
 from sklearn.pipeline import Pipeline
 
 from .mlworkflow import (LabelingStrategy, DataProcessorStrategy, DataSplitterStrategy, TrainerStrategy,
-                          EvaluatorStrategy, TextBlobLabeling, BasicDataSplitter, BasicTextProcessor, 
-                          SklearnPipelineTrainer, ModelEvaluator)
+                          EvaluatorStrategy)
 
 
 
@@ -27,6 +26,10 @@ class SentimentAnalysisPipeline:
     def run(self, data: pd.DataFrame) -> Dict[str, float]:
         labeled_data: pd.DataFrame = self.labeling_strategy.label(data)
         processed_data: pd.DataFrame = self.processing_strategy.process(labeled_data)
+        X_train : pd.Series
+        X_test : pd.Series
+        y_train : pd.Series
+        y_test : pd.Series
         X_train, X_test, y_train, y_test = self.splitting_strategy.split(processed_data)
         model: Pipeline = self.training_strategy.train(X_train, y_train)
         results: Dict[str, float] = self.evaluation_strategy.evaluate(model, X_test, y_test)

@@ -39,3 +39,9 @@ zenml stack register mlflow_stack \
     -o default \
     -a default \
     -e mlflow_tracker
+
+
+Hook up pipeline with ZenML and MLFlow
+Find a way to deploy Model
+Model to MLFlow model registry 
+COnnect to FAstAPi or shall we switch to bentoml for deployment

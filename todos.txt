@@ -29,7 +29,9 @@ zenml init --template starter
 zenml experiment-tracker register mlflow_tracker \
     --flavor=mlflow \
     --tracking_uri=http://localhost:5001 \
-    --tracking_username=dummy \
+    --tracking_username={{mlflow_secret.username}} \
+    --tracking_password={{mlflow_secret.password}}
+
 
 2. creating a new zenml stack that uses mlflow tracker, and it should connect to minio and postgres
 
@@ -39,6 +41,9 @@ zenml stack register mlflow_stack \
     -o default \
     -a default \
     -e mlflow_tracker
+
+
+zenml artifact-store register minio_store -f s3     --path='s3://zenml'     --authentication_secret=s3_secret     --client_kwargs='{"endpoint_url": "http://localhost:9000"}'
 
 
 Hook up pipeline with ZenML and MLFlow

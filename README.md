@@ -58,3 +58,11 @@ This should take you to your browser, where you need to confirm access.
 Then we need to install the zenml integrations for MLFlow, S3.
 
 `zenml integration install mlflow s3 --uv`
+
+Next is to register the artifact store, since we are using a selfhosted MinIO, it can be done like this:
+
+```
+zenml artifact-store register minio_store -f s3 --path='s3://zenml' --authentication_secret=s3_secret --client_kwargs='{"endpoint_url": "http://localhost:9000"}'
+```
+
+Make sure to configure your zenml secret. You can do this easily via the UI.

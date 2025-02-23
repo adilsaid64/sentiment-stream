@@ -44,4 +44,7 @@ def sentiment_analysis_pipeline(data: pd.DataFrame) -> None:
     X_train, X_test, y_train, y_test = split_data_step(processed_data)
     model = train_model_step(X_train, y_train)
     results: Dict[str, float] = evaluate_model_step(model, X_test, y_test)
+
+    # TODO: add mlflow for tracking experiments
+    # TODO: add mlflow to register model
     print("Evaluation Results:", results)

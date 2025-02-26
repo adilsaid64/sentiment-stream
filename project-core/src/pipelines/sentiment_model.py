@@ -9,6 +9,7 @@ from my_package.mlworkflow import (LabelingStrategy, TextBlobLabeling,
                                    DataSplitterStrategy, BasicDataSplitter,
                                    TrainerStrategy, SklearnPipelineTrainer,
                                    EvaluatorStrategy, ModelEvaluator)
+import mlflow
 
 # ZenML Steps
 @step
@@ -26,8 +27,9 @@ def split_data_step(data: pd.DataFrame) -> Tuple[pd.Series, pd.Series, pd.Series
     splitter: DataSplitterStrategy = BasicDataSplitter()
     return splitter.split(data)
 
-@step
+@step(experiment_tracker="mlflow_tracker")
 def train_model_step(X_train: pd.Series, y_train: pd.Series) -> Pipeline:
+    mlflow.autolog()
     trainer: TrainerStrategy = SklearnPipelineTrainer()
     return trainer.train(X_train, y_train)
 

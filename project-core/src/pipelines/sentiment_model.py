@@ -11,7 +11,6 @@ from my_package.mlworkflow import (LabelingStrategy, TextBlobLabeling,
                                    EvaluatorStrategy, ModelEvaluator)
 import mlflow
 
-# ZenML Steps
 @step
 def label_data_step(data: pd.DataFrame) -> pd.DataFrame:
     labeler: LabelingStrategy = TextBlobLabeling()
@@ -38,7 +37,6 @@ def evaluate_model_step(model: Pipeline, X_test: pd.Series, y_test: pd.Series) -
     evaluator: EvaluatorStrategy = ModelEvaluator()
     return evaluator.evaluate(model, X_test, y_test)
 
-# ZenML Pipeline
 @pipeline
 def sentiment_analysis_pipeline(data: pd.DataFrame) -> None:
     labeled_data: pd.DataFrame = label_data_step(data)

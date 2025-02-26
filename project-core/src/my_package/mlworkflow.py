@@ -12,6 +12,11 @@ from textblob import TextBlob  # For weak labeling
 from zenml import pipeline, step
 
 # Strategy Interfaces
+class DataLoadingStrategy(ABC):
+    @abstractmethod
+    def load_data(self, path:str)->pd.DataFrame:
+        pass
+
 class LabelingStrategy(ABC):
     @abstractmethod
     def label(self, data: pd.DataFrame) -> pd.DataFrame:
@@ -37,7 +42,18 @@ class EvaluatorStrategy(ABC):
     def evaluate(self, model: Pipeline, X_test: pd.Series, y_test: pd.Series) -> Dict[str, float]:
         pass
 
+from botocore.client import BaseClient
+
 # Concrete Implementations
+class LoadDatasetFromS3(DataLoadingStrategy):
+    def __init__(self, client:BaseClient, bucket:str):
+        self.client = client
+        self.bucket = bucket
+
+    def load_data(self, path:str)->pd.DataFrame:
+        "Load a dataset from s3"
+        return pd.DataFrame()
+
 class TextBlobLabeling(LabelingStrategy):
     def label(self, data: pd.DataFrame) -> pd.DataFrame:
         def get_sentiment(text: str) -> int:

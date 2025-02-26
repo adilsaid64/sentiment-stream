@@ -1,5 +1,7 @@
 from typing import Tuple, Dict
 
+from botocore.client import BaseClient
+import boto3
 from zenml import step, pipeline
 import pandas as pd
 from sklearn.pipeline import Pipeline
@@ -8,8 +10,16 @@ from my_package.mlworkflow import (LabelingStrategy, TextBlobLabeling,
                                    DataProcessorStrategy, BasicTextProcessor, 
                                    DataSplitterStrategy, BasicDataSplitter,
                                    TrainerStrategy, SklearnPipelineTrainer,
-                                   EvaluatorStrategy, ModelEvaluator)
+                                   EvaluatorStrategy, ModelEvaluator, DataLoadingStrategy, LoadDatasetFromS3)
 import mlflow
+
+
+@step
+def load_data_step(bucket:str, path:str) -> pd.DataFrame:
+    client : BaseClient = ...
+    data_loader : DataLoadingStrategy = LoadDatasetFromS3(client=client, bucket=bucket)
+    data : pd.DataFrame = data_loader.load_data(path = path)
+    return data
 
 @step
 def label_data_step(data: pd.DataFrame) -> pd.DataFrame:

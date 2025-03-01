@@ -1,4 +1,4 @@
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Annotated
 
 from botocore.client import BaseClient
 import boto3
@@ -15,35 +15,38 @@ import mlflow
 
 
 @step
-def load_data_step(bucket:str, path:str) -> pd.DataFrame:
+def load_data_step(bucket:str, path:str) -> Annotated[pd.DataFrame, "dataset"]:
     client : BaseClient = ...
     data_loader : DataLoadingStrategy = LoadDatasetFromS3(client=client, bucket=bucket)
     data : pd.DataFrame = data_loader.load_data(path = path)
     return data
 
 @step
-def label_data_step(data: pd.DataFrame) -> pd.DataFrame:
+def label_data_step(data: pd.DataFrame) -> Annotated[pd.DataFrame, "labeled_dataset"]:
     labeler: LabelingStrategy = TextBlobLabeling()
     return labeler.label(data)
 
 @step
-def process_data_step(data: pd.DataFrame) -> pd.DataFrame:
+def process_data_step(data: pd.DataFrame) -> Annotated[pd.DataFrame, "processed_data"]:
     processor: DataProcessorStrategy = BasicTextProcessor()
     return processor.process(data)
 
 @step
-def split_data_step(data: pd.DataFrame) -> Tuple[pd.Series, pd.Series, pd.Series, pd.Series]:
+def split_data_step(data: pd.DataFrame) -> Tuple[Annotated[pd.Series, "X_train"], 
+                                                 Annotated[pd.Series, "X_test"], 
+                                                 Annotated[pd.Series, "y_train"], 
+                                                 Annotated[pd.Series, "y_test"]]:
     splitter: DataSplitterStrategy = BasicDataSplitter()
     return splitter.split(data)
 
 @step(experiment_tracker="mlflow_tracker")
-def train_model_step(X_train: pd.Series, y_train: pd.Series) -> Pipeline:
+def train_model_step(X_train: pd.Series, y_train: pd.Series) -> Annotated[Pipeline, "pipeline"]:
     mlflow.autolog()
     trainer: TrainerStrategy = SklearnPipelineTrainer()
     return trainer.train(X_train, y_train)
 
 @step
-def evaluate_model_step(model: Pipeline, X_test: pd.Series, y_test: pd.Series) -> Dict[str, float]:
+def evaluate_model_step(model: Pipeline, X_test: pd.Series, y_test: pd.Series) -> Annotated[Dict[str, float], "test_results"]:
     evaluator: EvaluatorStrategy = ModelEvaluator()
     return evaluator.evaluate(model, X_test, y_test)
 
